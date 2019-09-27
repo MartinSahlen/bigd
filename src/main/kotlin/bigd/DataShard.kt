@@ -26,6 +26,7 @@ class DataShard<E:GenericRecord>(private val clazz: Class<E>, private val fileNa
             "avg" -> this.avg(key)
             "min" -> this.max(key)
             "max" -> this.min(key)
+            "count" -> this.count(key)
         }
     }
 
