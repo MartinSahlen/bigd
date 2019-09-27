@@ -3,21 +3,21 @@
  */
 package bigd
 
-import bigd.grpc.GreeterGrpc
-import bigd.grpc.HelloReply
-import bigd.grpc.HelloRequest
+import bigd.grpc.MapReducerGrpc
+import bigd.grpc.MapReduceReply
+import bigd.grpc.MapReduceRequest
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
 import java.util.logging.Logger
 
 
-private class Greeter: GreeterGrpc.GreeterImplBase() {
+private class Greeter: MapReducerGrpc.MapReducerImplBase() {
     val logger = Logger.getLogger(Greeter::class.java.name)
 
-    override fun sayHello(request: HelloRequest, responseObserver: StreamObserver<HelloReply>) {
-        logger.info("received request from ${request.name}")
-        val reply = HelloReply.newBuilder().setMessage("Hello " + request.getName()).build()
+    override fun mapReduce(request: MapReduceRequest, responseObserver: StreamObserver<MapReduceReply>) {
+        logger.info("received request for file URI ${request.uri}")
+        val reply = MapReduceReply.newBuilder().setMessage("Hello " + request.uri).build()
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

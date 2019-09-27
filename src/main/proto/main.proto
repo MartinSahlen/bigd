@@ -2,20 +2,22 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "bigd.grpc";
-package greeter;
+package mapreduce;
 
-// The greeting service definition.
-service Greeter {
+service MapReducer {
     // Sends a greeting
-    rpc SayHello (HelloRequest) returns (HelloReply) {}
+    rpc mapReduce (MapReduceRequest) returns (MapReduceReply) {}
 }
 
 // The request message containing the user's name.
-message HelloRequest {
-    string name = 1;
+message MapReduceRequest {
+    string operation = 1;
+    string uri = 2;
+    int32 shardNumber = 3;
+    int32 totalShards = 4;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message MapReduceReply {
     string message = 1;
 }

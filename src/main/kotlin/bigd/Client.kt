@@ -1,12 +1,12 @@
 package bigd
 
-import bigd.grpc.GreeterGrpc
+import bigd.grpc.MapReduceReply
+import bigd.grpc.MapReduceRequest
+import bigd.grpc.MapReducerGrpc
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import java.util.concurrent.TimeUnit
 import io.grpc.StatusRuntimeException
-import bigd.grpc.HelloReply
-import bigd.grpc.HelloRequest
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -14,11 +14,11 @@ class Client(host: String, port: Int) {
     private val channel: ManagedChannel = ManagedChannelBuilder.forAddress(host, port)
             .usePlaintext()
             .build()
-    private val blockingStub: GreeterGrpc.GreeterBlockingStub
+    private val blockingStub: MapReducerGrpc.MapReducerBlockingStub
     private val logger = Logger.getLogger(Client::class.java.name)
 
     init {
-        this.blockingStub = GreeterGrpc.newBlockingStub(channel)
+        this.blockingStub = MapReducerGrpc.newBlockingStub(channel)
     }
 
     fun shutdown() {
@@ -27,10 +27,10 @@ class Client(host: String, port: Int) {
 
     fun greet(name: String) {
         logger.info("Will try to greet $name ...")
-        val request = HelloRequest.newBuilder().setName(name).build()
-        val response: HelloReply
+        val request = MapReduceRequest.newBuilder().setUri(name).build()
+        val response: MapReduceReply
         try {
-            response = blockingStub.sayHello(request)
+            response = blockingStub.mapReduce(request)
         } catch (e: StatusRuntimeException) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.status)
             return
