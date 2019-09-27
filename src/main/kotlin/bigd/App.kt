@@ -3,10 +3,14 @@
  */
 package bigd
 
+import bigd.proto.Message
+
+
 class App {
     val greeting: String
         get() {
-            return "Hello world."
+        Message.getDescriptor()
+         return ""
         }
 }
 
