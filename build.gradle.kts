@@ -16,6 +16,11 @@ idea {
     }
 }
 
+java {                                      // (4)
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 val grpcVersion = "1.23.0" // CURRENT_GRPC_VERSION
 
 repositories {
@@ -33,6 +38,8 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:${grpcVersion}")
     implementation("io.grpc:grpc-protobuf:${grpcVersion}")
     implementation("io.grpc:grpc-stub:${grpcVersion}")
+    compileOnly("javax.annotation:javax.annotation-api:1.2")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
@@ -66,5 +73,5 @@ protobuf {
 
 application {
     // Define the main class for the application.
-    mainClassName = "bigd.AppKt"
+    mainClassName = "bigd.ServerKt"
 }
