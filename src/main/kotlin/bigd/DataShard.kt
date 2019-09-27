@@ -24,11 +24,6 @@ class DataShard(fileName: String) {
         dataFileWriter.close()
     }
 
-    private fun deserialize(): DataFileReader<GenericRecord> {
-        val datumReader = GenericDatumReader<GenericRecord>(this.schema)
-        return DataFileReader<GenericRecord>(this.file, datumReader)
-    }
-
     fun performOperation(key: String, operation: String) {
         when (operation) {
             "sum" -> this.sum(key)
@@ -38,30 +33,44 @@ class DataShard(fileName: String) {
         }
     }
 
-    private fun sum(key: String): Float {
-        val dataFileReader = this.deserialize()
-        return dataFileReader.reduce {r, s -> r + s.get(key) as Float}
+    private fun deserialize(): DataFileReader<GenericRecord> {
+        val datumReader = GenericDatumReader<GenericRecord>(this.schema)
+        return DataFileReader<GenericRecord>(this.file, datumReader)
     }
 
-    private fun avg(key: String) {
+    private fun getValues(key: String): List<Float> {
         val dataFileReader = this.deserialize()
-        return dataFileReader.reduce {r, s -> r + s.get(key) as Float}
+        return dataFileReader.map {r -> r.get(key) as Float}
+    }
+
+    private fun sum(key: String): Float {
+        return this.getValues(key).sum()
+    }
+
+    private fun avg(key: String): AvgStruct {
+        val values = this.getValues(key)
+        return AvgStruct(values.sum(), values.size)
     }
 
     private fun min(key: String): Float {
         val dataFileReader = this.deserialize()
         val minRecord = dataFileReader.minBy { record -> record.get(key) as Float }
-        return minRecord.get(key) as Float
+        return minRecord?.get(key) as Float
     }
 
     private fun max(key: String): Float {
         val dataFileReader = this.deserialize()
         val maxRecord = dataFileReader.maxBy { doc -> doc.get(key) as Float }
-        return maxRecord.get(key) as Float
+        return maxRecord?.get(key) as Float
     }
 
-    private fun count(key: String) {
-        val dataFileReader = this.deserialize()
-        return dataFileReader.reduce {r, s -> r + s.get(key) as Float}
+    private fun count(key: String): Int {
+        return this.getValues(key).size
+    }
+
+    internal class AvgStruct(val sum: Float, val count: Int) {
+        fun getValue(): Float {
+            return this.sum / this.count
+        }
     }
 }
