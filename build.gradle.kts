@@ -1,14 +1,19 @@
 import com.google.protobuf.gradle.*
-import org.gradle.kotlin.dsl.provider.gradleKotlinDslOf
 
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
     id("org.jetbrains.kotlin.jvm").version("1.3.21")
     id("com.google.protobuf").version("0.8.8")
-
+    idea
     java
     // Apply the application plugin to add support for building a CLI application.
     application
+}
+
+idea {
+    module {
+        generatedSourceDirs.add(file("build/generated/java"))
+    }
 }
 
 val grpcVersion = "1.23.0" // CURRENT_GRPC_VERSION
