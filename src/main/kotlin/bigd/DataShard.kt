@@ -1,25 +1,21 @@
 package bigd
 
-import org.apache.avro.Schema
 import org.apache.avro.file.DataFileReader
 import org.apache.avro.file.DataFileWriter
-import org.apache.avro.generic.GenericDatumReader
-import org.apache.avro.generic.GenericDatumWriter
 import org.apache.avro.generic.GenericRecord
+import org.apache.avro.reflect.ReflectDatumReader
+import org.apache.avro.reflect.ReflectDatumWriter
 import java.io.File
 
+class DataShard<E:GenericRecord>(private val clazz: Class<E>, private val fileName: String) {
 
-class DataShard(fileName: String) {
+    val file = File(fileName)
 
-    private val file: File = File(fileName)
-    private val schema: Schema = Schema.Parser().parse(this.file)
-
-    fun serialize(collection: Collection<GenericRecord>) {
-        val datumWriter = GenericDatumWriter<GenericRecord>(this.schema)
-        val dataFileWriter = DataFileWriter<GenericRecord>(datumWriter)
-        dataFileWriter.create(this.schema, this.file)
+    fun serialize(collection: Collection<E>) {
+        val userDatumWriter = ReflectDatumWriter(clazz)
+        val dataFileWriter = DataFileWriter(userDatumWriter)
         for (doc in collection) {
-            dataFileWriter.append(doc)
+            dataFileWriter.create(doc.schema, File(fileName))
         }
         dataFileWriter.close()
     }
@@ -33,14 +29,14 @@ class DataShard(fileName: String) {
         }
     }
 
-    private fun deserialize(): DataFileReader<GenericRecord> {
-        val datumReader = GenericDatumReader<GenericRecord>(this.schema)
-        return DataFileReader<GenericRecord>(this.file, datumReader)
+    private fun deserialize(): DataFileReader<E> {
+        val reader = ReflectDatumReader(clazz)
+        return DataFileReader<E>(file, reader)
     }
 
     private fun getValues(key: String): List<Float> {
-        val dataFileReader = this.deserialize()
-        return dataFileReader.map {r -> r.get(key) as Float}
+        val reader = this.deserialize()
+        return reader.map {r -> r.get(key) as Float}
     }
 
     private fun sum(key: String): Float {

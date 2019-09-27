@@ -35,6 +35,9 @@ class App() {
                 .start()
         greeter.logger.info("Server started, listening on " + port);
 
+        val dataShard = DataShard(DataPoint::class.java,"store/data.avro")
+        dataShard.performOperation("value", "sum")
+
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
