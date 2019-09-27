@@ -4,6 +4,8 @@ plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
     id("org.jetbrains.kotlin.jvm").version("1.3.21")
     id("com.google.protobuf").version("0.8.8")
+    id("com.commercehub.gradle.plugin.avro").version("0.17.0")
+
     idea
     java
     // Apply the application plugin to add support for building a CLI application.
@@ -33,6 +35,8 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:${grpcVersion}")
     implementation("io.grpc:grpc-protobuf:${grpcVersion}")
     implementation("io.grpc:grpc-stub:${grpcVersion}")
+    implementation("org.apache.avro:avro:1.8.2")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 

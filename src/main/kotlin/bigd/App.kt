@@ -4,6 +4,12 @@
 package bigd
 
 import bigd.proto.Message
+import org.apache.avro.file.DataFileReader
+import org.apache.avro.file.DataFileWriter
+import org.apache.avro.generic.GenericDatumReader
+import org.apache.avro.generic.GenericDatumWriter
+import org.apache.avro.generic.GenericRecord
+import java.io.File
 
 
 class App {
@@ -12,6 +18,28 @@ class App {
         Message.getDescriptor()
          return ""
         }
+
+    fun serializeData() {
+        val file = File("users.avro")
+        val datumWriter = GenericDatumWriter<GenericRecord>(schema)
+        val dataFileWriter = DataFileWriter<GenericRecord>(datumWriter)
+        dataFileWriter.create(schema, file)
+        dataFileWriter.append(user1)
+        dataFileWriter.append(user2)
+        dataFileWriter.close()
+    }
+
+    fun deserializeData() {
+        val datumReader = GenericDatumReader<GenericRecord>(schema)
+        val dataFileReader = DataFileReader<GenericRecord>(file, datumReader)
+        val user: GenericRecord? = null
+        while (dataFileReader.hasNext()) {
+            user = dataFileReader.next(user);
+            System.out.println(user);
+        }
+    }
+
+
 }
 
 fun main(args: Array<String>) {
