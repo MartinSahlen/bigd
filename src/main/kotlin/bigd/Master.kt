@@ -55,6 +55,8 @@ class Master() {
 }
 
 fun main() {
+    val util = FileUtil()
+    util.readfile()
     val server = Master()
     server.blockUntilShutdown()
 }
