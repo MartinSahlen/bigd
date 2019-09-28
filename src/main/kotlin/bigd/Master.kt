@@ -26,6 +26,7 @@ private class Greeter(val slaveNodes: ArrayList<NodeInfo>): GreeterGrpc.GreeterI
         logger.info("received greeting from node ${request.nodeId}")
         logger.info("Current number of slaves are ${slaveNodes.size}")
         val reply = GreetingReply.newBuilder().setMessage("Hello " + request.nodeId).setPort(nextPort).build()
+
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
@@ -70,7 +71,7 @@ class Master() {
 
 fun main() {
     val util = FileUtil()
-    util.readfile()
+    util.readFile()
     val server = Master()
     server.blockUntilShutdown()
 }
