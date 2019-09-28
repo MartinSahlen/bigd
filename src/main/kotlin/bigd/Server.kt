@@ -9,14 +9,21 @@ import bigd.grpc.MapReduceRequest
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
-import org.apache.avro.Schema
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.logging.Logger
+import java.util.concurrent.atomic.AtomicInteger
+
+
 
 
 private class Greeter: MapReducerGrpc.MapReducerImplBase() {
     val logger = Logger.getLogger(Greeter::class.java.name)
 
     override fun mapReduce(request: MapReduceRequest, responseObserver: StreamObserver<MapReduceReply>) {
+        val chunkSize = 3
+        val counter = AtomicInteger()
+        Files.lines(Paths.get(this.javaClass.classLoader.getResource("data.json").toURI()))
         logger.info("received request for file URI ${request.uri}")
         val reply = MapReduceReply.newBuilder().setMessage("Hello " + request.uri).build()
         responseObserver.onNext(reply);
@@ -35,34 +42,6 @@ class App() {
                 .build()
                 .start()
         greeter.logger.info("Server started, listening on " + port);
-
-       val point = DataPoint()
-val schemaJson  =      """
-{
-  "type": "record",
-  "name": "Person",
-  "namespace": "com.ippontech.kafkatutorials",
-  "fields": [
-    {
-      "name": "firstName",
-      "type": "string"
-    },
-    {
-      "name": "lastName",
-      "type": "string"
-    },
-    {
-      "name": "birthDate",
-      "type": "long"
-    }
-  ]
-}
-        """.trimIndent()
-
-        val schema = Schema.Parser().parse(schemaJson)
-
-        val dataShard = DataShard<DataPoint>(point.schema,"store/data.avro")
-        dataShard.performOperation("value", "sum")
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
