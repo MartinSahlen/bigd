@@ -12,8 +12,8 @@ class DataShard(private val fileName: String, private val offset: Long, private 
         when (operation) {
             "sum" -> return this.sum(key)
 //            "avg" -> return this.avg(key)
-//            "min" -> return this.max(key)
-//            "max" -> return this.min(key)
+            "min" -> return this.min(key)
+            "max" -> return this.max(key)
 //            "count" -> return this.count(key)
         }
         return 0.0
@@ -32,15 +32,20 @@ class DataShard(private val fileName: String, private val offset: Long, private 
         return AvgStruct(0F,0)
     }
 
-    private fun min(key: String): Float {
-        //val minRecord = dataFileReader.minBy { record -> record.get(key) as Float }
-        return 0F
+    private fun min(key: String): Double {
+        return fileUtil
+                .readFile(this.fileName, this.offset, this.limit)
+                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .min(Double::compareTo)
+                .get()
     }
 
-    private fun max(key: String): Float {
-       // val maxRecord = dataFileReader.maxBy { doc -> doc.get(key) as Float }
-        return 0F
-        //return maxRecord?.get(key) as Float
+    private fun max(key: String): Double {
+        return fileUtil
+                .readFile(this.fileName, this.offset, this.limit)
+                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .max(Double::compareTo)
+                .get()
     }
 
     private fun count(key: String): Int {

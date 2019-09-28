@@ -76,7 +76,7 @@ class Master() {
         val values = slaveNodes.mapIndexed {index, node ->
             val request = MapReduceRequest
                     .newBuilder()
-                    .setOperation("sum")
+                    .setOperation("min")
                     .setIndex(fileName)
                     .setKey("tripduration")
                     .setLimit(shardSize)
