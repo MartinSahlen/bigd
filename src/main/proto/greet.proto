@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "bigd.grpc";
+package greeter;
+
+service Greeter {
+    // Sends a greeting
+    rpc greetMaster (GreetingRequest) returns (GreetingReply) {}
+}
+
+// The request message containing the user's name.
+message GreetingRequest {
+    string nodeId = 1;
+}
+
+// The response message containing the greetings
+message GreetingReply {
+    string message = 1;
+    int32 port = 2;
+}
