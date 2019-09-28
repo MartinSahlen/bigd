@@ -1,18 +1,21 @@
 package bigd
 
+import org.apache.avro.Schema
 import org.apache.avro.file.DataFileReader
 import org.apache.avro.file.DataFileWriter
 import org.apache.avro.generic.GenericRecord
 import org.apache.avro.reflect.ReflectDatumReader
 import org.apache.avro.reflect.ReflectDatumWriter
+import org.apache.avro.specific.SpecificDatumReader
+import org.apache.avro.specific.SpecificDatumWriter
 import java.io.File
 
-class DataShard<E:GenericRecord>(private val clazz: Class<E>, private val fileName: String) {
+class DataShard<E:GenericRecord>(private val schema: Schema, private val fileName: String) {
 
     val file = File(fileName)
 
     fun serialize(collection: Collection<E>) {
-        val userDatumWriter = ReflectDatumWriter(clazz)
+        val userDatumWriter = SpecificDatumWriter<E>(schema)
         val dataFileWriter = DataFileWriter(userDatumWriter)
         for (doc in collection) {
             dataFileWriter.create(doc.schema, File(fileName))
@@ -31,7 +34,7 @@ class DataShard<E:GenericRecord>(private val clazz: Class<E>, private val fileNa
     }
 
     private fun deserialize(): DataFileReader<E> {
-        val reader = ReflectDatumReader(clazz)
+        val reader = SpecificDatumReader<E>(schema)
         return DataFileReader<E>(file, reader)
     }
 

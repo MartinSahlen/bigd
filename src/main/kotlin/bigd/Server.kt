@@ -9,6 +9,7 @@ import bigd.grpc.MapReduceRequest
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import io.grpc.stub.StreamObserver
+import org.apache.avro.Schema
 import java.util.logging.Logger
 
 
@@ -35,7 +36,32 @@ class App() {
                 .start()
         greeter.logger.info("Server started, listening on " + port);
 
-        val dataShard = DataShard(DataPoint::class.java,"store/data.avro")
+       val point = DataPoint()
+val schemaJson  =      """
+{
+  "type": "record",
+  "name": "Person",
+  "namespace": "com.ippontech.kafkatutorials",
+  "fields": [
+    {
+      "name": "firstName",
+      "type": "string"
+    },
+    {
+      "name": "lastName",
+      "type": "string"
+    },
+    {
+      "name": "birthDate",
+      "type": "long"
+    }
+  ]
+}
+        """.trimIndent()
+
+        val schema = Schema.Parser().parse(schemaJson)
+
+        val dataShard = DataShard<DataPoint>(point.schema,"store/data.avro")
         dataShard.performOperation("value", "sum")
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
