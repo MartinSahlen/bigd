@@ -15,7 +15,7 @@ private class MapReduce: MapReducerGrpc.MapReducerImplBase() {
         logger.info("Received map reduce request for index ${request.index}")
         val dataShard = DataShard(request.index, request.offset, request.limit)
         val value = dataShard.performOperation(request.key, request.operation)
-        val reply = MapReduceReply.newBuilder().setValue(value as Float).build()
+        val reply = MapReduceReply.newBuilder().setValue(value).build()
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }

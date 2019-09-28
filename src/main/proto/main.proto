@@ -14,11 +14,11 @@ message MapReduceRequest {
     string operation = 1;
     string key = 2;
     string index = 3;
-    string offset = 4;
-    string limit = 5;
+    int64 offset = 4;
+    int64 limit = 5;
 }
 
 // The response message containing the greetings
 message MapReduceReply {
-    float value = 1;
+    double value = 1;
 }

@@ -3,11 +3,14 @@ package bigd
 import bigd.grpc.*
 import io.grpc.*
 import io.grpc.stub.StreamObserver
+import java.lang.String.format
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.logging.Logger
 
 private class NodeInfo(val id: String, val port: Int, val channel: ManagedChannel, val blockingStub: MapReducerGrpc.MapReducerBlockingStub) {}
 
-private class Greeter(val slaveNodes: ArrayList<NodeInfo>): GreeterGrpc.GreeterImplBase() {
+private class Greeter(val slaveNodes: ArrayList<NodeInfo>, private val master: Master): GreeterGrpc.GreeterImplBase() {
     val logger = Logger.getLogger(Greeter::class.java.name)
 
     fun deliverPort(): Int {
@@ -27,6 +30,8 @@ private class Greeter(val slaveNodes: ArrayList<NodeInfo>): GreeterGrpc.GreeterI
 
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
+
+        master.requestAllData()
     }
 
     override fun sayGoodbye(request: GoodbyeRequest, responseObserver: StreamObserver<GoodbyeReply>) {
@@ -45,9 +50,9 @@ class Master() {
     private val slaveNodes: ArrayList<NodeInfo> = arrayListOf()
 
     init {
-        val greeter = Greeter(slaveNodes)
+        val greeter = Greeter(slaveNodes, this)
         server = ServerBuilder.forPort(MASTER_PORT)
-                .addService(Greeter(slaveNodes))
+                .addService(greeter)
                 .build()
                 .start()
         greeter.logger.info("Server started, listening on $MASTER_PORT")
@@ -62,20 +67,33 @@ class Master() {
         })
     }
 
-    private fun requestDataFromNode(node: NodeInfo): Float? {
-        val request = MapReduceRequest.newBuilder().setOperation("sum").setIndex("cityBike").setKey("tripduration").build()
-        val response: MapReduceReply
-        try {
-            response = node.blockingStub.mapReduce(request)
-        } catch (e: StatusRuntimeException) {
-            return null
-        }
-        return response.value
-    }
-
     fun requestAllData() {
-        val values = slaveNodes.map {node -> requestDataFromNode(node)}
-        println("Values: $values")
+        val fileName = "data.json"
+        val stream = Files.lines(Paths.get(this.javaClass.classLoader.getResource(fileName).toURI()))
+        val count = stream.count()
+        val numNodes = slaveNodes.size
+        val shardSize = count / numNodes;
+        val values = slaveNodes.mapIndexed {index, node ->
+            val request = MapReduceRequest
+                    .newBuilder()
+                    .setOperation("sum")
+                    .setIndex(fileName)
+                    .setKey("tripduration")
+                    .setLimit(shardSize)
+                    .setOffset(index * shardSize)
+                    .build()
+
+            val response: MapReduceReply
+            try {
+                response = node.blockingStub.mapReduce(request)
+                response.value
+                val value = response.value
+                println(format("%f", value))
+            } catch (e: StatusRuntimeException) {
+
+            }
+        }
+
     }
 
     fun blockUntilShutdown() {
@@ -84,8 +102,6 @@ class Master() {
 }
 
 fun main() {
-    val util = FileUtil()
-    util.readFile()
     val server = Master()
     server.blockUntilShutdown()
 }

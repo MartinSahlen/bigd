@@ -1,29 +1,31 @@
 package bigd
 
-import java.io.File
+import java.lang.Double.parseDouble
+import java.lang.Float.parseFloat
 
-class DataShard(private val fileName: String) {
 
-    val file = File(fileName)
+class DataShard(private val fileName: String, private val offset: Long, private val limit: Long) {
 
-    fun performOperation(key: String, operation: String): Any {
+    val fileUtil = FileUtil()
+
+    fun performOperation(key: String, operation: String): Double {
         when (operation) {
             "sum" -> return this.sum(key)
-            "avg" -> return this.avg(key)
-            "min" -> return this.max(key)
-            "max" -> return this.min(key)
-            "count" -> return this.count(key)
+//            "avg" -> return this.avg(key)
+//            "min" -> return this.max(key)
+//            "max" -> return this.min(key)
+//            "count" -> return this.count(key)
         }
-        return 0
+        return 0.0
     }
 
-    private fun getValues(key: String): List<Float> {
-        return listOf(0F)
-       // return reader.map {r -> r.get(key) as Float}
-    }
 
-    private fun sum(key: String): Float {
-        return this.getValues(key).sum()
+    private fun sum(key: String): Double {
+        return fileUtil
+                .readFile(this.fileName, this.offset, this.limit)
+                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .reduce { sum, element -> sum + element }
+                .get()
     }
 
     private fun avg(key: String): AvgStruct {
@@ -42,7 +44,7 @@ class DataShard(private val fileName: String) {
     }
 
     private fun count(key: String): Int {
-        return this.getValues(key).size
+        return 0 //this.getValues(key).size
     }
 
     internal class AvgStruct(val sum: Float, val count: Int) {
