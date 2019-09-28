@@ -7,6 +7,7 @@ package greeter;
 service Greeter {
     // Sends a greeting
     rpc greetMaster (GreetingRequest) returns (GreetingReply) {}
+    rpc sayGoodbye (GoodbyeRequest) returns (GoodbyeReply) {}
 }
 
 // The request message containing the user's name.
@@ -18,4 +19,12 @@ message GreetingRequest {
 message GreetingReply {
     string message = 1;
     int32 port = 2;
+}
+
+message GoodbyeRequest {
+    string nodeId = 1;
+}
+
+message GoodbyeReply {
+    string message = 1;
 }
