@@ -2,18 +2,19 @@ package bigd
 
 import java.io.File
 
-class DataShard<E>(private val fileName: String) {
+class DataShard(private val fileName: String) {
 
     val file = File(fileName)
 
-    fun performOperation(key: String, operation: String) {
+    fun performOperation(key: String, operation: String): Any {
         when (operation) {
-            "sum" -> this.sum(key)
-            "avg" -> this.avg(key)
-            "min" -> this.max(key)
-            "max" -> this.min(key)
-            "count" -> this.count(key)
+            "sum" -> return this.sum(key)
+            "avg" -> return this.avg(key)
+            "min" -> return this.max(key)
+            "max" -> return this.min(key)
+            "count" -> return this.count(key)
         }
+        return 0
     }
 
     private fun getValues(key: String): List<Float> {

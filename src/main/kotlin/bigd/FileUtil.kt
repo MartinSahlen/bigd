@@ -10,7 +10,7 @@ class FileUtil {
         val count = stream.count()
         val numNodes = 4
         val shardSize = count / numNodes;
-        for (i in 0..numNodes-1) {
+        for (i in 0..numNodes - 1) {
             readFile(fileName, i * shardSize, shardSize)
         }
     }
@@ -21,6 +21,5 @@ class FileUtil {
         if (first.isPresent) {
             println(first.get())
         }
-
     }
 }

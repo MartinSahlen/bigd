@@ -12,8 +12,10 @@ private class MapReduce: MapReducerGrpc.MapReducerImplBase() {
     val logger = Logger.getLogger(MapReduce::class.java.name)
 
     override fun mapReduce(request: MapReduceRequest, responseObserver: StreamObserver<MapReduceReply>) {
-        logger.info("received request for file URI ${request.uri}")
-        val reply = MapReduceReply.newBuilder().setMessage("Hello " + request.uri).build()
+        logger.info("Received map reduce request for index ${request.index}")
+        val dataShard = DataShard(request.index, request.offset, request.limit)
+        val value = dataShard.performOperation(request.key, request.operation)
+        val reply = MapReduceReply.newBuilder().setValue(value as Float).build()
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
