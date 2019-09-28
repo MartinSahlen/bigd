@@ -23,7 +23,7 @@ private class Greeter: MapReducerGrpc.MapReducerImplBase() {
     override fun mapReduce(request: MapReduceRequest, responseObserver: StreamObserver<MapReduceReply>) {
         val chunkSize = 3
         val counter = AtomicInteger()
-        Files.lines(Paths.get(this.javaClass.classLoader.getResource("data.json").toURI()))
+        Files.lines(Paths.get(this.javaClass.classLoader.getResource("data.json").toURI())).co
         logger.info("received request for file URI ${request.uri}")
         val reply = MapReduceReply.newBuilder().setMessage("Hello " + request.uri).build()
         responseObserver.onNext(reply);
