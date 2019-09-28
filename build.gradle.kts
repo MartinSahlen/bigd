@@ -40,6 +40,8 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:${grpcVersion}")
     implementation("io.grpc:grpc-protobuf:${grpcVersion}")
     implementation("io.grpc:grpc-stub:${grpcVersion}")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.9.10")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.10")
 
     compileOnly("javax.annotation:javax.annotation-api:1.2")
 
