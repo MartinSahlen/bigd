@@ -12,12 +12,13 @@ service MapReducer {
 // The request message containing the user's name.
 message MapReduceRequest {
     string operation = 1;
-    string uri = 2;
-    int32 shardNumber = 3;
-    int32 totalShards = 4;
+    string key = 2;
+    string index = 3;
+    string offset = 4;
+    string limit = 5;
 }
 
 // The response message containing the greetings
 message MapReduceReply {
-    string message = 1;
+    float value = 1;
 }
