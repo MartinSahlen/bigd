@@ -41,9 +41,18 @@ class Slave(private val nodeId: String, host: String, port: Int) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.status)
             return null
         }
-
         logger.info("Master is saying: " + response.message)
         return response
+    }
+
+    fun sayGoodbye() {
+        logger.info("Will inform master about shudown at $MASTER_HOST:$MASTER_PORT")
+        val request = GoodbyeRequest.newBuilder().setNodeId(nodeId).build()
+        try {
+            blockingStub.sayGoodbye(request)
+        } catch (e: StatusRuntimeException) {
+            logger.log(Level.WARNING, "RPC failed: {0}", e.status)
+        }
     }
 
     fun startServer(port: Int) {
@@ -52,13 +61,14 @@ class Slave(private val nodeId: String, host: String, port: Int) {
                 .addService(MapReduce())
                 .build()
                 .start()
-        mapReduce.logger.info("Server started, listening on $MASTER_PORT")
+        mapReduce.logger.info("Server started, listening on $port")
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
                 // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                 System.err.println("*** shutting down gRPC server since JVM is shutting down")
                 server?.shutdown()
+                sayGoodbye()
                 shutdownChannel()
                 System.err.println("*** server shut down")
             }
