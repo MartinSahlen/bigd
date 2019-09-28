@@ -23,7 +23,7 @@ class DataShard(private val fileName: String, private val offset: Long, private 
     private fun sum(key: String): Double {
         return fileUtil
                 .readFile(this.fileName, this.offset, this.limit)
-                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .map {  parseDouble(it.get(key).asText()) }
                 .reduce { sum, element -> sum + element }
                 .get()
     }
@@ -35,7 +35,7 @@ class DataShard(private val fileName: String, private val offset: Long, private 
     private fun min(key: String): Double {
         return fileUtil
                 .readFile(this.fileName, this.offset, this.limit)
-                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .map {  parseDouble(it.get(key).asText()) }
                 .min(Double::compareTo)
                 .get()
     }
@@ -43,7 +43,7 @@ class DataShard(private val fileName: String, private val offset: Long, private 
     private fun max(key: String): Double {
         return fileUtil
                 .readFile(this.fileName, this.offset, this.limit)
-                .map {  parseDouble(it.get(key).toString().replace("\"", "")) }
+                .map {  parseDouble(it.get(key).asText()) }
                 .max(Double::compareTo)
                 .get()
     }
