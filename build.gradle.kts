@@ -40,7 +40,6 @@ dependencies {
     implementation("io.grpc:grpc-netty-shaded:${grpcVersion}")
     implementation("io.grpc:grpc-protobuf:${grpcVersion}")
     implementation("io.grpc:grpc-stub:${grpcVersion}")
-    implementation("org.apache.avro:avro:1.8.2")
 
     compileOnly("javax.annotation:javax.annotation-api:1.2")
 
