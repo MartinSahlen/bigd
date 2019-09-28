@@ -41,7 +41,6 @@ class Slave(private val nodeId: String, host: String, port: Int) {
             logger.log(Level.WARNING, "RPC failed: {0}", e.status)
             return null
         }
-
         logger.info("Master is saying: " + response.message)
         return response
     }
@@ -52,7 +51,7 @@ class Slave(private val nodeId: String, host: String, port: Int) {
                 .addService(MapReduce())
                 .build()
                 .start()
-        mapReduce.logger.info("Server started, listening on $MASTER_PORT")
+        mapReduce.logger.info("Server started, listening on $port")
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {

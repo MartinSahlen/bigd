@@ -15,11 +15,17 @@ private class NodeInfo(val id: String, val port: Int) {}
 private class Greeter(val slaveNodes: ArrayList<NodeInfo>): GreeterGrpc.GreeterImplBase() {
     val logger = Logger.getLogger(Greeter::class.java.name)
 
+    fun deliverPort(): Int {
+        val max = slaveNodes.maxBy { s -> s.port}
+        return if (max != null) max.port + 1 else SLAVE_PORT_RANGE[0]
+    }
+
     override fun greetMaster(request: GreetingRequest, responseObserver: StreamObserver<GreetingReply>) {
-        slaveNodes.add(NodeInfo(request.nodeId, 50052))
+        val nextPort = deliverPort()
+        slaveNodes.add(NodeInfo(request.nodeId, nextPort))
         logger.info("received greeting from node ${request.nodeId}")
         logger.info("Current number of slaves are ${slaveNodes.size}")
-        val reply = GreetingReply.newBuilder().setMessage("Hello " + request.nodeId).build()
+        val reply = GreetingReply.newBuilder().setMessage("Hello " + request.nodeId).setPort(nextPort).build()
         responseObserver.onNext(reply);
         responseObserver.onCompleted();
     }
